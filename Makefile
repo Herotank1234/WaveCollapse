@@ -6,10 +6,10 @@ TARGET = waveFunctionCollapse
 
 .PHONY: all clean
 
-all: $(TARGET) tile.o board.o
+all: $(TARGET) 
 
-$(TARGET): $(TARGET).o
-	$(CC) $(CFLAGS) -o $(TARGET) $(TARGET).o
+$(TARGET): $(TARGET).o board.o tile.o
+	$(CC) $(CFLAGS) -o $(TARGET) $(TARGET).o board.o tile.o
 
 $(TARGET).o: $(SRC)$(TARGET).cpp
 	$(CC) $(CFLAGS) -c $(SRC)$(TARGET).cpp
