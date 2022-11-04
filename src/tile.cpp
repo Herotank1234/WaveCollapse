@@ -25,3 +25,6 @@ void Tile::collapseTile() {
   _finalised = true;
 }
 
+std::string Tile::getFinalTile() {
+  return _finalTile;
+}

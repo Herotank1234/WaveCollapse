@@ -10,6 +10,7 @@ public:
   void setFinalTile();
   bool isFinalised();
   void collapseTile();
+  std::string getFinalTile();
 private:
   std::vector<std::string> _possibleTiles;
   std::string _finalTile;
