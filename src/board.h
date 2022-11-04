@@ -6,6 +6,9 @@ class Board {
 public:
   Board();
   void printBoard();
+  std::pair<int, int> findTileWithLeastEntropy();
+  void collapseRandomTile();
+  void collapseTile(int x, int y);
 private:
   std::vector<std::vector<Tile>> _board;
 };
