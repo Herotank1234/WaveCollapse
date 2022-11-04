@@ -1,5 +1,6 @@
 #include "board.h"
 #include <iostream>
+
 int BOARD_LENGTH = 5;
 int BOARD_WIDTH = 5;
 int MAX_ENTROPY = 13;
@@ -50,4 +51,13 @@ void Board::collapseRandomTile() {
 
 void Board::collapseTile(int x, int y) {
   _board[y][x].collapseTile();
+}
+ 
+bool Board::isFinalised() {
+  for(int i = 0; i < BOARD_LENGTH; i++) {
+    for(int j = 0; j < BOARD_WIDTH; j++) {
+      if(!_board[i][j].isFinalised()) return false;
+    }
+  }
+  return true;
 }

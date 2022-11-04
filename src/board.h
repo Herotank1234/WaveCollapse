@@ -9,6 +9,7 @@ public:
   std::pair<int, int> findTileWithLeastEntropy();
   void collapseRandomTile();
   void collapseTile(int x, int y);
+  bool isFinalised();
 private:
   std::vector<std::vector<Tile>> _board;
 };
