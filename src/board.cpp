@@ -15,6 +15,7 @@ Board::Board() {
 
 void Board::printBoard() {
   for(auto row : _board) {
+    std::cout << "| ";
     for(auto tile : row) {
       std::cout << tile.getFinalTile() << " | ";
     }
