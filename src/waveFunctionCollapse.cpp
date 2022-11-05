@@ -14,13 +14,10 @@ int main() {
   Board* board = new Board();
 
   while(!board->isFinalised()) {
-    std::pair<int, int> coords = board->findTileWithLeastEntropy();
-    std::cout << coords.first << " " << coords.second << std::endl;
-    if(coords.first == -1) {
-      board->collapseRandomTile();
-    } else {
-      board->collapseTile(coords.first, coords.second);
-    }
+    std::vector<std::pair<int, int>> coords = board->findTilesWithLeastEntropy();
+    std::cout << coords.size() << std::endl;
+    int index = rand() % coords.size();
+    board->collapseTile(coords[index].first, coords[index].second); 
     board->printBoard();
     std::cout << std::endl;
   }
