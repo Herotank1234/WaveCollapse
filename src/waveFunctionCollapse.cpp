@@ -8,6 +8,7 @@
 #include <map>
 #include "board.h"
 #include "tile.h"
+#include <GL/glut.h>
 
 int main() {
   srand(time(NULL));
