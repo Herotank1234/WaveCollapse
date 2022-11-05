@@ -1,6 +1,7 @@
 #include "Tile.h"
 #include <stdlib.h>
 #include <map>
+#include <algorithm>
 
 std::map<std::string, std::vector<std::string>> edgeRules = {
   {"Black", {"bbb", "bbb", "bbb", "bbb"}},
