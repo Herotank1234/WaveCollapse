@@ -47,10 +47,12 @@ void Board::collapseRandomTile() {
     y = rand() % BOARD_LENGTH;
   }
   _board[y][x].collapseTile();
+  propagate(x, y);
 }
 
 void Board::collapseTile(int x, int y) {
   _board[y][x].collapseTile();
+  propagate(x, y);
 }
  
 bool Board::isFinalised() {
@@ -60,4 +62,19 @@ bool Board::isFinalised() {
     }
   }
   return true;
+}
+
+void Board::propagate(int x, int y) {
+  std::vector<std::pair<int, int>> steps = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+  for(size_t i = 0; i < steps.size(); i++) {
+      std::pair<int, int> currStep = steps[i];
+      int nextX = x + currStep.first, nextY = y + currStep.second;
+      if(inBounds(nextX, nextY) && !_board[nextY][nextX].isFinalised()) {
+        _board[nextY][nextX].reducePossibleTiles(i, _board[y][x].getFinalTile());
+      }
+  }
+}
+
+bool Board::inBounds(int x, int y) {
+  return x >= 0 && x < BOARD_WIDTH && y >= 0 && y < BOARD_LENGTH;
 }
