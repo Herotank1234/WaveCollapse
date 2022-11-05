@@ -3,7 +3,7 @@
 
 int BOARD_LENGTH = 5;
 int BOARD_WIDTH = 5;
-int MAX_ENTROPY = 13;
+int MAX_ENTROPY = 36;
 
 Board::Board() {
   for(int i = 0; i < BOARD_LENGTH; i++) {
@@ -25,29 +25,27 @@ void Board::printBoard() {
   }
 }
 
-std::pair<int, int> Board::findTileWithLeastEntropy() {
-  int x = -1, y = -1, leastEntropy = MAX_ENTROPY, entropy = 0;
+std::vector<std::pair<int, int>> Board::findTilesWithLeastEntropy() {
+  int leastEntropy = MAX_ENTROPY, entropy = 0;
   for(int i = 0; i < BOARD_LENGTH; i++) {
     for(int j = 0; j < BOARD_LENGTH; j++) {
       entropy = _board[i][j].getNumberOfPossibleTiles();
+      std::cout << entropy << std::endl;
       if(!_board[i][j].isFinalised() && entropy < leastEntropy) {
-        y = i;
-        x = j;
         leastEntropy = entropy;
       }
     }
   }
-  return std::pair<int, int>({x, y});
-}
-
-void Board::collapseRandomTile() {
-  int x = rand() % BOARD_WIDTH, y = rand() % BOARD_LENGTH;
-  while(_board[y][x].isFinalised()) {
-    x = rand() % BOARD_WIDTH;
-    y = rand() % BOARD_LENGTH;
+  std::vector<std::pair<int, int>> res;
+  for(int i = 0; i < BOARD_LENGTH; i++) {
+    for(int j = 0; j < BOARD_WIDTH; j++) {
+      entropy = _board[i][j].getNumberOfPossibleTiles();
+      if(!_board[i][j].isFinalised() && entropy == leastEntropy) {
+        res.push_back({j, i});
+      }
+    }
   }
-  _board[y][x].collapseTile();
-  propagate(x, y);
+  return res;
 }
 
 void Board::collapseTile(int x, int y) {
