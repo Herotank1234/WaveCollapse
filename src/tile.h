@@ -11,6 +11,7 @@ public:
   bool isFinalised();
   void collapseTile();
   std::string getFinalTile();
+  void reducePossibleTiles(int direction, std::string edge);
 private:
   std::vector<std::string> _possibleTiles;
   std::string _finalTile;
