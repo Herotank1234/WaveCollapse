@@ -66,7 +66,8 @@ bool Tile::isFinalised() {
 
 void Tile::collapseTile() {
   int index = rand() % _possibleTiles.size();
-  _finalTile = _possibleTiles[index];
+  _possibleTiles = {_possibleTiles[index]};
+  _finalTile = _possibleTiles[0];
   _finalised = true;
 }
 
@@ -74,9 +75,9 @@ std::string Tile::getFinalTile() {
   return _finalTile;
 }
 
-void Tile::reducePossibleTiles(int direction, std::string edge) {
+void Tile::reducePossibleTiles(int direction, std::string tile) {
   int reflectedDir = (direction + 2) % 4;
-  std::string reflectedEdge = edge;
+  std::string reflectedEdge = edgeRules[tile][direction];
   std::reverse(reflectedEdge.begin(), reflectedEdge.end());
   std::vector<std::string> remainingTiles;
   for(std::string t : _possibleTiles) {
