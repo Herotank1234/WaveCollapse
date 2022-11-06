@@ -1,8 +1,10 @@
 SRC = ./src/
+LIBDIR = ./lib/
 
 CC = g++
 CFLAGS = -Wall -g
-LIB = -lglut -lGLU -lGL
+INC = -I/usr/include -I./lib/glad/include
+LIB = -lGL -lglfw
 TARGET = waveFunctionCollapse
 
 .PHONY: all clean
@@ -10,7 +12,7 @@ TARGET = waveFunctionCollapse
 all: $(TARGET) 
 
 $(TARGET): $(TARGET).o board.o tile.o
-	$(CC) $(CFLAGS) -o $(TARGET) $(TARGET).o board.o tile.o $(LIB)
+	$(CC) $(CFLAGS) $(INC) -o $(TARGET) $(TARGET).o board.o tile.o $(LIB) ./lib/glad/src/glad.c
 
 $(TARGET).o: $(SRC)$(TARGET).cpp
 	$(CC) $(CFLAGS) $(INC) -c $(SRC)$(TARGET).cpp
