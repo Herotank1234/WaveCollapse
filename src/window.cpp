@@ -1,8 +1,20 @@
 #include "window.h"
 #include <iostream>
 
-extern int BOARD_LENGTH;
-extern int BOARD_WIDTH;
+const int TILE_SIZE = 14;
+const char* vertexShaderSource = "#version 330 core\n"
+"layout (location = 0) in vec3 aPos;\n"
+"void main()\n"
+"{\n"
+" gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+"}\0";
+const char* fragmentShaderSource = "#version 330 core\n"
+"out vec4 FragColor;\n"
+"void main()\n"
+"{\n"
+" FragColor = vec4(0.8f, 0.3f, 0.02f, 1.0f);\n"
+"}\n\0";
+
 
 Window::Window(Board* board) : _board(board) {}
 
@@ -12,7 +24,8 @@ int Window::windowInit() {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-  _window = glfwCreateWindow(800, 800, "hello", NULL, NULL);
+  std::pair<int, int> size = _board->getSize();
+  _window = glfwCreateWindow(size.first * TILE_SIZE, size.second * TILE_SIZE, "hello", NULL, NULL);
   if(_window == NULL) {
     std::cout << "Failed to create GLFW window" << std::endl;
     glfwTerminate();
@@ -32,4 +45,12 @@ Window::~Window() {
     glfwDestroyWindow(_window);
     glfwTerminate();
   }
+}
+
+bool Window::shouldClose() {
+  return glfwWindowShouldClose(_window);
+}
+
+void Window::pollEvents() {
+  glfwPollEvents();
 }

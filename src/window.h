@@ -9,6 +9,8 @@ public:
   Window(Board* board);
   ~Window();
   int windowInit();
+  bool shouldClose();
+  void pollEvents();
 private:
   GLFWwindow* _window;
   Board* _board;
