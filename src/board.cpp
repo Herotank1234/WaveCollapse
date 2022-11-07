@@ -1,14 +1,10 @@
 #include "board.h"
 #include <iostream>
 
-int BOARD_LENGTH = 5;
-int BOARD_WIDTH = 5;
-int MAX_ENTROPY = 36;
-
-Board::Board() {
-  for(int i = 0; i < BOARD_LENGTH; i++) {
+Board::Board(int length, int width) : _length(length), _width(width) {
+  for(int i = 0; i < _length; i++) {
     std::vector<Tile> row;
-    for(int j = 0; j < BOARD_WIDTH; j++) {
+    for(int j = 0; j < _width; j++) {
       row.emplace_back();
     }
     _board.push_back(row);
@@ -26,9 +22,9 @@ void Board::printBoard() {
 }
 
 std::vector<std::pair<int, int>> Board::findTilesWithLeastEntropy() {
-  int leastEntropy = MAX_ENTROPY, entropy = 0;
-  for(int i = 0; i < BOARD_LENGTH; i++) {
-    for(int j = 0; j < BOARD_LENGTH; j++) {
+  int leastEntropy = _maxEntropy, entropy = 0;
+  for(int i = 0; i < _length; i++) {
+    for(int j = 0; j < _length; j++) {
       entropy = _board[i][j].getNumberOfPossibleTiles();
       std::cout << entropy << std::endl;
       if(!_board[i][j].isFinalised() && entropy < leastEntropy) {
@@ -37,8 +33,8 @@ std::vector<std::pair<int, int>> Board::findTilesWithLeastEntropy() {
     }
   }
   std::vector<std::pair<int, int>> res;
-  for(int i = 0; i < BOARD_LENGTH; i++) {
-    for(int j = 0; j < BOARD_WIDTH; j++) {
+  for(int i = 0; i < _length; i++) {
+    for(int j = 0; j < _width; j++) {
       entropy = _board[i][j].getNumberOfPossibleTiles();
       if(!_board[i][j].isFinalised() && entropy == leastEntropy) {
         res.push_back({j, i});
@@ -54,8 +50,8 @@ void Board::collapseTile(int x, int y) {
 }
  
 bool Board::isFinalised() {
-  for(int i = 0; i < BOARD_LENGTH; i++) {
-    for(int j = 0; j < BOARD_WIDTH; j++) {
+  for(int i = 0; i < _length; i++) {
+    for(int j = 0; j < _width; j++) {
       if(!_board[i][j].isFinalised()) return false;
     }
   }
@@ -74,5 +70,9 @@ void Board::propagate(int x, int y) {
 }
 
 bool Board::inBounds(int x, int y) {
-  return x >= 0 && x < BOARD_WIDTH && y >= 0 && y < BOARD_LENGTH;
+  return x >= 0 && x < _width && y >= 0 && y < _length;
+}
+
+std::pair<int, int> Board::getSize() {
+  return {_width, _length};
 }
