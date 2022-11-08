@@ -87,20 +87,19 @@ void Window::pollEvents() {
 }
 
 void Window::updateDisplay() {
+  std::pair<int, int> size = _board->getSize();
   glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
   _shader->activateProgram();
   _texture->bindTexture();
   _VAO->bindArray();
-  for(size_t i = 0; i < _indices.size(); i+=2) {
-    if(i % 4) {
-      _texture->changeTexture(_imageMap["Dot"]);
-    } else {
-      _texture->changeTexture(_imageMap["Green"]);
+  for(int i = 0; i < size.second; i++) {
+    for(int j = 0; j < size.first; j++) {
+      _texture->changeTexture(_imageMap[_board->getTileName(j, i)]);
+      _EBO->bindBuffer();
+      _EBO->changeBufferData((GLuint *)&_indices[((i * size.first) + j) * 2], 2 * sizeof(TriangleIndices)); 
+      glDrawElements(GL_TRIANGLES, 2 * 3, GL_UNSIGNED_INT, 0);
     }
-    _EBO->bindBuffer();
-    _EBO->changeBufferData((GLuint *)&_indices[i], 2 * sizeof(TriangleIndices)); 
-    glDrawElements(GL_TRIANGLES, 2 * 3, GL_UNSIGNED_INT, 0);
   }
   glfwSwapBuffers(_window);
 }
@@ -141,13 +140,24 @@ void Window::initIndices() {
 }
 
 void Window::initImages() {
-  stbi_set_flip_vertically_on_load(true);
-  std::vector<std::string> imageFilenames = {"Dot", "Green"};
+  std::vector<std::string> imageFilenames = {"Black", "Connector", "Connector90", 
+    "Connector180", "Connector270", "ConnectorEdge", "ConnectorEdge90", 
+    "ConnectorEdge180", "ConnectorEdge270", "DiagPipeOne", "DiagPipeOne90", 
+    "DiagPipeOne180", "DiagPipeOne270", "DiagPipeTwoL", "DiagPipeTwoR", "Dot", 
+    "Dot90", "Dot180", "Dot270", "DotTwoWayH", "DotTwoWayV", "Green", "PipeCrossH",
+    "PipeCrossV", "PipeGreenH", "PipeGreenV", "PipeGreyH", "PipeGreyV", "PipeSwitch",
+    "PipeSwitch90", "PipeSwitch180", "PipeSwitch270", "PipeT", "PipeT90", "PipeT180", 
+    "PipeT270", "Blank"
+  };
   for(std::string filename : imageFilenames) {
     ImageData* data = new ImageData();
     std::string path = "./images/" + filename + ".png";
     data->bytes = stbi_load(path.c_str(), &(data->width),
       &(data->height), &(data->colorChs), 0);
-    _imageMap.insert({filename, data});
+    if(filename != "Blank") {
+      _imageMap.insert({filename, data});
+    } else {
+      _imageMap.insert({"", data});
+    }
   }
 }
