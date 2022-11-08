@@ -26,9 +26,11 @@ int main(int argc, char** argv) {
     if(!board->isFinalised()) {
       std::vector<std::pair<int, int>> coords = board->findTilesWithLeastEntropy();
       int index = rand() % coords.size();
-      if(!board->collapseTile(coords[index].first, coords[index].second)) {
+      std::pair<int, int> coord = coords[index];
+      if(!board->collapseTile(coord.first, coord.second)) {
         board = new Board(20, 20);
-      }; 
+        window->setBoard(board);
+      } 
     }
     window->updateDisplay();
     window->pollEvents();
