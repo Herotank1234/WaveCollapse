@@ -161,3 +161,7 @@ void Window::initImages() {
     }
   }
 }
+
+void Window::setBoard(Board* board) {
+  _board = board;
+}

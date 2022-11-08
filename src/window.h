@@ -22,6 +22,7 @@ public:
   void initIndices();
   void initImages();
   void updateDisplay();
+  void setBoard(Board* board);
 private:
   GLFWwindow* _window;
   Board* _board;
