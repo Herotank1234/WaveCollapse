@@ -48,3 +48,7 @@ void Shader::activateProgram() {
 void Shader::deleteProgram() {
   glDeleteProgram(_ID);
 }
+
+GLuint Shader::getID() {
+  return _ID;
+}

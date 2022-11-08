@@ -10,6 +10,7 @@ public:
   Shader(const char* vertexSourceFile, const char* fragmentSourceFile);
   void activateProgram();
   void deleteProgram();
+  GLuint getID();
 private:
   GLuint _ID;
 };
