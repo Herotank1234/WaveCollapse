@@ -2,6 +2,9 @@
 #define WINDOW_H
 #include "board.h"
 #include "shader.h"
+#include "EBO.h"
+#include "VAO.h"
+#include "VBO.h"
 #include "../lib/glad/include/glad/glad.h"
 #include <GLFW/glfw3.h>
 
@@ -18,7 +21,9 @@ public:
 private:
   GLFWwindow* _window;
   Board* _board;
-  GLuint _VAO, _VBO, _EBO;
+  VBO* _VBO;
+  EBO* _EBO;
+  VAO* _VAO;
   Shader* _shader;
   typedef struct Vertex {
     GLfloat x, y, z;

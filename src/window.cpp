@@ -36,22 +36,17 @@ int Window::windowInit() {
   initVertices();
   initIndices();
 
-  glGenVertexArrays(1, &_VAO);
-  glGenBuffers(1, &_VBO);
-  glGenBuffers(1, &_EBO);
+  _VAO = new VAO();
+  _VAO->bindArray();
 
-  glBindVertexArray(_VAO);
-  glBindBuffer(GL_ARRAY_BUFFER, _VBO);
-  glBufferData(GL_ARRAY_BUFFER, _vertices.size() * sizeof(Vertex), &_vertices.front(), GL_STATIC_DRAW);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _EBO);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, _indices.size() * sizeof(SquareIndices), &_indices.front(), GL_STATIC_DRAW);
-
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *) 0);
-  glEnableVertexAttribArray(0);
-
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindVertexArray(0);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+  _VBO = new VBO((GLfloat *) &_vertices.front(), _vertices.size() * sizeof(Vertex));
+  _EBO = new EBO((GLuint *) &_indices.front(), _indices.size() * sizeof(SquareIndices));
+  
+  _VAO->linkVBO(*_VBO, 0);
+  
+  _VAO->unbindArray();
+  _VBO->unbindBuffer();
+  _EBO->unbindBuffer();
 
   glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
@@ -61,9 +56,9 @@ int Window::windowInit() {
 
 Window::~Window() {
   if(_window != NULL) {
-    glDeleteVertexArrays(1, &_VAO);
-    glDeleteBuffers(1, &_VBO);
-    glDeleteBuffers(1, &_EBO);
+    _VAO->deleteArray();
+    _VBO->deleteBuffer();
+    _EBO->deleteBuffer();
     _shader->deleteProgram();
     glfwDestroyWindow(_window);
     glfwTerminate();
@@ -76,6 +71,19 @@ bool Window::shouldClose() {
 
 void Window::pollEvents() {
   glfwPollEvents();
+}
+
+void Window::updateDisplay() {
+  glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+  glClear(GL_COLOR_BUFFER_BIT);
+  _shader->activateProgram();
+  _VAO->bindArray();
+  for(size_t i = 0; i < _indices.size(); i+=2) {
+    _EBO->bindBuffer();
+    _EBO->changeBufferData((GLuint *)&_indices[i], 2 * sizeof(SquareIndices)); 
+    glDrawElements(GL_TRIANGLES, 2 * 3, GL_UNSIGNED_INT, 0);
+  }
+  glfwSwapBuffers(_window);
 }
 
 void Window::initVertices() {
@@ -100,13 +108,4 @@ void Window::initIndices() {
         i * adjLength + (j + 1), (i + 1) * adjLength + (j + 1)));
     }
   }
-}
-
-void Window::updateDisplay() {
-  glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-  glClear(GL_COLOR_BUFFER_BIT);
-  _shader->activateProgram();
-  glBindVertexArray(_VAO);
-  glDrawElements(GL_TRIANGLES, _indices.size() * 3, GL_UNSIGNED_INT, 0);
-  glfwSwapBuffers(_window);
 }
