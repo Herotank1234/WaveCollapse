@@ -12,10 +12,6 @@ const float WINDOW_V_START = 1.0f;
 
 Window::Window(Board* board) : _board(board) {}
 
-Window::Vertex::Vertex(GLfloat x1, GLfloat y1, GLfloat z1) : x(x1), y(y1), z(z1) {}
-
-Window::SquareIndices::SquareIndices(GLuint x1, GLuint y1, GLuint z1) : x(x1), y(y1), z(z1) {}
-
 int Window::windowInit() {
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -23,7 +19,8 @@ int Window::windowInit() {
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
   std::pair<int, int> size = _board->getSize();
-  _window = glfwCreateWindow(size.first * TILE_SIZE, size.second * TILE_SIZE, "hello", NULL, NULL);
+  _window = glfwCreateWindow(size.first * TILE_SIZE, size.second * TILE_SIZE, 
+    "Wave Function Collapse", NULL, NULL);
   if(_window == NULL) {
     std::cout << "Failed to create GLFW window" << std::endl;
     glfwTerminate();
@@ -37,18 +34,28 @@ int Window::windowInit() {
 
   initVertices();
   initIndices();
+  initImages();
 
   _VAO = new VAO();
   _VAO->bindArray();
 
   _VBO = new VBO((GLfloat *) &_vertices.front(), _vertices.size() * sizeof(Vertex));
-  _EBO = new EBO((GLuint *) &_indices.front(), _indices.size() * sizeof(SquareIndices));
+  _EBO = new EBO((GLuint *) &_indices.front(), 
+    _indices.size() * sizeof(TriangleIndices));
   
-  _VAO->linkVBO(*_VBO, 0);
+  _VAO->linkAttrib(*_VBO, 0, 3, GL_FLOAT, sizeof(Vertex), (void *) 0);
+  _VAO->linkAttrib(*_VBO, 1, 2, GL_FLOAT, sizeof(Vertex), 
+    (void *) (3 * sizeof(float)));
   
   _VAO->unbindArray();
   _VBO->unbindBuffer();
   _EBO->unbindBuffer();
+
+  _texture = new Texture();
+
+  GLuint tex0uni = glGetUniformLocation(_shader->getID(), "tex0");
+  _shader->activateProgram();
+  glUniform1i(tex0uni, 0);
 
   glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
@@ -62,6 +69,10 @@ Window::~Window() {
     _VBO->deleteBuffer();
     _EBO->deleteBuffer();
     _shader->deleteProgram();
+    _texture->deleteTexture();
+    for(auto it = _imageMap.begin(); it != _imageMap.end(); it++) {
+      stbi_image_free(it->second->bytes);
+    }
     glfwDestroyWindow(_window);
     glfwTerminate();
   }
@@ -79,10 +90,16 @@ void Window::updateDisplay() {
   glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
   _shader->activateProgram();
+  _texture->bindTexture();
   _VAO->bindArray();
   for(size_t i = 0; i < _indices.size(); i+=2) {
+    if(i % 4) {
+      _texture->changeTexture(_imageMap["Dot"]);
+    } else {
+      _texture->changeTexture(_imageMap["Green"]);
+    }
     _EBO->bindBuffer();
-    _EBO->changeBufferData((GLuint *)&_indices[i], 2 * sizeof(SquareIndices)); 
+    _EBO->changeBufferData((GLuint *)&_indices[i], 2 * sizeof(TriangleIndices)); 
     glDrawElements(GL_TRIANGLES, 2 * 3, GL_UNSIGNED_INT, 0);
   }
   glfwSwapBuffers(_window);
@@ -90,29 +107,41 @@ void Window::updateDisplay() {
 
 void Window::initVertices() {
   std::pair<int, int> size = _board->getSize();
-  float stepSizeH = WINDOW_SIZE / (float) size.first, stepSizeV = WINDOW_SIZE / (float) size.second;
-  for(int i = 0; i <= size.second; i++) {
-    for(int j = 0; j <= size.first; j++) {
+  float stepSizeH = WINDOW_SIZE / (float) size.first, stepSizeV 
+    = WINDOW_SIZE / (float) size.second;
+  for(int i = 0; i <  size.second; i++) {
+    for(int j = 0; j < size.first; j++) {
       _vertices.push_back(Vertex(WINDOW_H_START + (j * stepSizeH),
-        WINDOW_V_START - (i * stepSizeV), 0.0f));
+        WINDOW_V_START - (i * stepSizeV), 0.0f, 0.0f, 1.0f));
+      _vertices.push_back(Vertex(WINDOW_H_START + (j * stepSizeH),
+        WINDOW_V_START - ((i + 1) * stepSizeV), 0.0f, 0.0f, 0.0f));
+      _vertices.push_back(Vertex(WINDOW_H_START + ((j + 1) * stepSizeH),
+        WINDOW_V_START - ((i + 1) * stepSizeV), 0.0f, 1.0f, 0.0f));
+      _vertices.push_back(Vertex(WINDOW_H_START + (j * stepSizeH),
+        WINDOW_V_START - (i * stepSizeV), 0.0f, 0.0f, 1.0f));
+      _vertices.push_back(Vertex(WINDOW_H_START + ((j + 1) * stepSizeH),
+        WINDOW_V_START - ((i + 1) * stepSizeV), 0.0f, 1.0f, 0.0f));
+      _vertices.push_back(Vertex(WINDOW_H_START + ((j + 1) * stepSizeH),
+        WINDOW_V_START - (i * stepSizeV), 0.0f, 1.0f, 1.0f));
     }
   }
 }
 
 void Window::initIndices() {
   std::pair<int, int> size = _board->getSize();
-  int length = size.first, width = size.second, adjLength = length + 1;
+  int length = size.first, width = size.second, index = 0;
   for(int i = 0; i < length; i++) {
     for(int j = 0; j < width; j++) {
-      _indices.push_back(SquareIndices((i + 1) * adjLength + j,
-        i * adjLength + j, i * adjLength + (j + 1)));
-      _indices.push_back(SquareIndices((i + 1) * adjLength + j,
-        i * adjLength + (j + 1), (i + 1) * adjLength + (j + 1)));
+      _indices.push_back(TriangleIndices(index, index + 1, index + 2));
+      index += 3;
+      _indices.push_back(TriangleIndices(index, index + 1, index + 2));
+      index += 3;
     }
   }
 }
 
 void Window::initImages() {
+  stbi_set_flip_vertically_on_load(true);
   std::vector<std::string> imageFilenames = {"Dot", "Green"};
   for(std::string filename : imageFilenames) {
     ImageData* data = new ImageData();
