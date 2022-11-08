@@ -26,7 +26,6 @@ std::vector<std::pair<int, int>> Board::findTilesWithLeastEntropy() {
   for(int i = 0; i < _length; i++) {
     for(int j = 0; j < _length; j++) {
       entropy = _board[i][j].getNumberOfPossibleTiles();
-      std::cout << entropy << std::endl;
       if(!_board[i][j].isFinalised() && entropy < leastEntropy) {
         leastEntropy = entropy;
       }
@@ -44,9 +43,10 @@ std::vector<std::pair<int, int>> Board::findTilesWithLeastEntropy() {
   return res;
 }
 
-void Board::collapseTile(int x, int y) {
-  _board[y][x].collapseTile();
+bool Board::collapseTile(int x, int y) {
+  if(!_board[y][x].collapseTile()) return false;
   propagate(x, y);
+  return true;
 }
  
 bool Board::isFinalised() {
@@ -75,4 +75,8 @@ bool Board::inBounds(int x, int y) {
 
 std::pair<int, int> Board::getSize() {
   return {_width, _length};
+}
+
+std::string Board::getTileName(int x, int y) {
+  return _board[y][x].getFinalTile();
 }

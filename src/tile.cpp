@@ -64,11 +64,13 @@ bool Tile::isFinalised() {
   return _finalised;
 }
 
-void Tile::collapseTile() {
+bool Tile::collapseTile() {
+  if(_possibleTiles.size() == 0) return false;
   int index = rand() % _possibleTiles.size();
   _possibleTiles = {_possibleTiles[index]};
   _finalTile = _possibleTiles[0];
   _finalised = true;
+  return true;
 }
 
 std::string Tile::getFinalTile() {

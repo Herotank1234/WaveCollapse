@@ -9,7 +9,7 @@ public:
   int getNumberOfPossibleTiles();
   void setFinalTile();
   bool isFinalised();
-  void collapseTile();
+  bool collapseTile();
   std::string getFinalTile();
   void reducePossibleTiles(int direction, std::string tile);
 private:
