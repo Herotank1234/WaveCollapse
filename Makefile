@@ -6,13 +6,14 @@ CFLAGS = -Wall -g
 INC = -I/usr/include -I./lib/glad/include
 LIB = -lGL -lglfw 
 TARGET = waveFunctionCollapse
+OBJ = board.o tile.o window.o shader.o VBO.o EBO.o VAO.o structs.o texture.o
 
 .PHONY: all clean
 
 all: $(TARGET) 
 
-$(TARGET): $(TARGET).o board.o tile.o window.o shader.o VBO.o EBO.o VAO.o structs.o texture.o
-	$(CC) $(CFLAGS) $(INC) -o $(TARGET) $(TARGET).o board.o tile.o window.o shader.o VBO.o EBO.o VAO.o structs.o texture.o $(LIB) ./lib/glad/src/glad.c
+$(TARGET): $(TARGET).o $(OBJ)
+	$(CC) $(CFLAGS) $(INC) -o $(TARGET) $(TARGET).o $(OBJ) $(LIB) ./lib/glad/src/glad.c
 
 $(TARGET).o: $(SRC)$(TARGET).cpp
 	$(CC) $(CFLAGS) $(INC) -c $(SRC)$(TARGET).cpp
