@@ -7,6 +7,7 @@
 #include "VBO.h"
 #include "../lib/glad/include/glad/glad.h"
 #include <GLFW/glfw3.h>
+#include <map>
 
 class Window {
 public:
@@ -17,6 +18,7 @@ public:
   void pollEvents();
   void initVertices();
   void initIndices();
+  void initImages();
   void updateDisplay();
 private:
   GLFWwindow* _window;
@@ -33,8 +35,13 @@ private:
     GLuint x, y, z;
     SquareIndices(GLuint x1, GLuint y1, GLuint z1);
   } SquareIndices;
+  typedef struct ImageData {
+    int width, height, colorChs;
+    unsigned char* bytes;
+  } ImageData;
   std::vector<Vertex> _vertices;
   std::vector<SquareIndices> _indices;
+  std::map<std::string, ImageData*> _imageMap;
 };
 
 #endif

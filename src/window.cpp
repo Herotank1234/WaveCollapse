@@ -1,8 +1,10 @@
+#define STB_IMAGE_IMPLEMENTATION
 #include "window.h"
 #include <iostream>
 #include <math.h>
+#include <stb/stb_image.h>
 
-const int TILE_SIZE = 14;
+const int TILE_SIZE = 32;
 const int POINTS_PER_TILE = 12;
 const int WINDOW_SIZE = 2;
 const float WINDOW_H_START = -1.0f;
@@ -107,5 +109,16 @@ void Window::initIndices() {
       _indices.push_back(SquareIndices((i + 1) * adjLength + j,
         i * adjLength + (j + 1), (i + 1) * adjLength + (j + 1)));
     }
+  }
+}
+
+void Window::initImages() {
+  std::vector<std::string> imageFilenames = {"Dot", "Green"};
+  for(std::string filename : imageFilenames) {
+    ImageData* data = new ImageData();
+    std::string path = "./images/" + filename + ".png";
+    data->bytes = stbi_load(path.c_str(), &(data->width),
+      &(data->height), &(data->colorChs), 0);
+    _imageMap.insert({filename, data});
   }
 }

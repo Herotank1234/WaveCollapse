@@ -4,7 +4,7 @@ LIBDIR = ./lib/
 CC = g++
 CFLAGS = -Wall -g
 INC = -I/usr/include -I./lib/glad/include
-LIB = -lGL -lglfw
+LIB = -lGL -lglfw 
 TARGET = waveFunctionCollapse
 
 .PHONY: all clean
@@ -37,7 +37,6 @@ VBO.o: $(SRC)VBO.cpp
 
 EBO.o: $(SRC)EBO.cpp 
 	$(CC) $(CFLAGS) $(INC) -c $(SRC)EBO.cpp
-
 
 clean:
 	rm $(TARGET) *.o
