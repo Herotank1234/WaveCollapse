@@ -11,8 +11,8 @@ TARGET = waveFunctionCollapse
 
 all: $(TARGET) 
 
-$(TARGET): $(TARGET).o board.o tile.o window.o shader.o VBO.o
-	$(CC) $(CFLAGS) $(INC) -o $(TARGET) $(TARGET).o board.o tile.o window.o shader.o VBO.o $(LIB) ./lib/glad/src/glad.c
+$(TARGET): $(TARGET).o board.o tile.o window.o shader.o VBO.o EBO.o VAO.o
+	$(CC) $(CFLAGS) $(INC) -o $(TARGET) $(TARGET).o board.o tile.o window.o shader.o VBO.o EBO.o VAO.o $(LIB) ./lib/glad/src/glad.c
 
 $(TARGET).o: $(SRC)$(TARGET).cpp
 	$(CC) $(CFLAGS) $(INC) -c $(SRC)$(TARGET).cpp
@@ -29,8 +29,14 @@ window.o: $(SRC)window.cpp $(SRC)board.h
 shader.o: $(SRC)shader.cpp 
 	$(CC) $(CFLAGS) $(INC) -c $(SRC)shader.cpp
 
+VAO.o: $(SRC)VAO.cpp $(SRC)VBO.h 
+	$(CC) $(CFLAGS) $(INC) -c $(SRC)VAO.cpp
+
 VBO.o: $(SRC)VBO.cpp 
 	$(CC) $(CFLAGS) $(INC) -c $(SRC)VBO.cpp
+
+EBO.o: $(SRC)EBO.cpp 
+	$(CC) $(CFLAGS) $(INC) -c $(SRC)EBO.cpp
 
 
 clean:
