@@ -6,6 +6,11 @@ VBO::VBO(GLfloat* vertices, GLsizeiptr size) {
   glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
 }
 
+void VBO::bufferNewData(GLfloat* vertices, GLsizeiptr size) {
+  glBindBuffer(GL_ARRAY_BUFFER, _ID);
+  glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
+}
+
 void VBO::bindBuffer() {
   glBindBuffer(GL_ARRAY_BUFFER, _ID);
 }
