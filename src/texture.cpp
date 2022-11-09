@@ -15,7 +15,6 @@ Texture::Texture() {
 void Texture::changeTexture(ImageData* imgData) {
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imgData->width, imgData->height,
     0, GL_RGB, GL_UNSIGNED_BYTE, imgData->bytes);
-  glGenerateMipmap(GL_TEXTURE_2D);
 }
 
 void Texture::bindTexture() {
