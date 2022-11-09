@@ -1,9 +1,9 @@
 #version 330 core
 out vec4 FragColor;
 
-in vec2 texCoord;
+in vec3 texCoord;
 
-uniform sampler2D tex0;
+uniform sampler2DArray tex0;
 
 void main()
 {
