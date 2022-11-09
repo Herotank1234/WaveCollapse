@@ -44,14 +44,14 @@ int Window::windowInit() {
     _indices.size() * sizeof(TriangleIndices));
   
   _VAO->linkAttrib(*_VBO, 0, 3, GL_FLOAT, sizeof(Vertex), (void *) 0);
-  _VAO->linkAttrib(*_VBO, 1, 2, GL_FLOAT, sizeof(Vertex), 
+  _VAO->linkAttrib(*_VBO, 1, 3, GL_FLOAT, sizeof(Vertex), 
     (void *) (3 * sizeof(float)));
   
   _VAO->unbindArray();
   _VBO->unbindBuffer();
   _EBO->unbindBuffer();
-
-  _texture = new Texture();
+  _texture = new Texture(_imageMap);
+  _layerMap = _texture->getLayerMap();
 
   GLuint tex0uni = glGetUniformLocation(_shader->getID(), "tex0");
   _shader->activateProgram();
@@ -87,20 +87,16 @@ void Window::pollEvents() {
 }
 
 void Window::updateDisplay() {
-  std::pair<int, int> size = _board->getSize();
   glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
+  updateVertices();
   _shader->activateProgram();
+  _VBO->bindBuffer();
+  _VBO->bufferNewData((GLfloat *) &_vertices.front(), 
+    _vertices.size() * sizeof(Vertex));
   _texture->bindTexture();
   _VAO->bindArray();
-  for(int i = 0; i < size.second; i++) {
-    for(int j = 0; j < size.first; j++) {
-      _texture->changeTexture(_imageMap[_board->getTileName(j, i)]);
-      _EBO->bindBuffer();
-      _EBO->changeBufferData((GLuint *)&_indices[((i * size.first) + j) * 2], 2 * sizeof(TriangleIndices)); 
-      glDrawElements(GL_TRIANGLES, 2 * 3, GL_UNSIGNED_INT, 0);
-    }
-  }
+  glDrawElements(GL_TRIANGLES, _indices.size() * 3, GL_UNSIGNED_INT, 0);
   glfwSwapBuffers(_window);
 }
 
@@ -111,17 +107,17 @@ void Window::initVertices() {
   for(int i = 0; i <  size.second; i++) {
     for(int j = 0; j < size.first; j++) {
       _vertices.push_back(Vertex(WINDOW_H_START + (j * stepSizeH),
-        WINDOW_V_START - (i * stepSizeV), 0.0f, 0.0f, 1.0f));
+        WINDOW_V_START - (i * stepSizeV), 0.0f, 0.0f, 1.0f, 0.0f));
       _vertices.push_back(Vertex(WINDOW_H_START + (j * stepSizeH),
-        WINDOW_V_START - ((i + 1) * stepSizeV), 0.0f, 0.0f, 0.0f));
+        WINDOW_V_START - ((i + 1) * stepSizeV), 0.0f, 0.0f, 0.0f, 0.0f));
       _vertices.push_back(Vertex(WINDOW_H_START + ((j + 1) * stepSizeH),
-        WINDOW_V_START - ((i + 1) * stepSizeV), 0.0f, 1.0f, 0.0f));
+        WINDOW_V_START - ((i + 1) * stepSizeV), 0.0f, 1.0f, 0.0f, 0.0f));
       _vertices.push_back(Vertex(WINDOW_H_START + (j * stepSizeH),
-        WINDOW_V_START - (i * stepSizeV), 0.0f, 0.0f, 1.0f));
+        WINDOW_V_START - (i * stepSizeV), 0.0f, 0.0f, 1.0f, 0.0f));
       _vertices.push_back(Vertex(WINDOW_H_START + ((j + 1) * stepSizeH),
-        WINDOW_V_START - ((i + 1) * stepSizeV), 0.0f, 1.0f, 0.0f));
+        WINDOW_V_START - ((i + 1) * stepSizeV), 0.0f, 1.0f, 0.0f, 0.0f));
       _vertices.push_back(Vertex(WINDOW_H_START + ((j + 1) * stepSizeH),
-        WINDOW_V_START - (i * stepSizeV), 0.0f, 1.0f, 1.0f));
+        WINDOW_V_START - (i * stepSizeV), 0.0f, 1.0f, 1.0f, 0.0f));
     }
   }
 }
@@ -164,4 +160,17 @@ void Window::initImages() {
 
 void Window::setBoard(Board* board) {
   _board = board;
+}
+
+void Window::updateVertices() {
+  std::pair<int, int> size = _board->getSize();
+  for(int i = 0; i < size.second; i++) {
+    for(int j = 0; j < size.first; j++) {
+      int index = 6 * ((i * size.first) + j);
+      int texLayer = _layerMap[_board->getTileName(j, i)];
+      for(int k = index; k < index + 6; k++) {
+        _vertices[k].c = texLayer;
+      }
+    }
+  }
 }

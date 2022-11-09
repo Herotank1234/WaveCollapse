@@ -23,6 +23,7 @@ public:
   void initImages();
   void updateDisplay();
   void setBoard(Board* board);
+  void updateVertices();
 private:
   GLFWwindow* _window;
   Board* _board;
@@ -34,6 +35,7 @@ private:
   std::vector<Vertex> _vertices;
   std::vector<TriangleIndices> _indices;
   std::map<std::string, ImageData*> _imageMap;
+  std::map<std::string, int> _layerMap;
 };
 
 #endif
