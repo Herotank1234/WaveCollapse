@@ -3,8 +3,8 @@
 #include "../lib/glad/include/glad/glad.h"
 
 typedef struct Vertex {
-  GLfloat x, y, z, tx, ty;
-  Vertex(GLfloat x1, GLfloat y1, GLfloat z1, GLfloat tx1, GLfloat ty1);
+  GLfloat x, y, z, tx, ty, c;
+  Vertex(GLfloat x1, GLfloat y1, GLfloat z1, GLfloat tx1, GLfloat ty1, GLfloat c1);
 } Vertex;
 
 typedef struct TriangleIndices {
